@@ -1,0 +1,109 @@
+---
+title: "Performance"
+guide-section: "Advanced Usage"
+tags: [Performance]
+---
+
+This page explains why multimark is fast, how to measure its performance, and what practices help you get the most throughput when processing documents at scale.
+
+## Why Multimark Is Fast
+
+Multimark wraps a compiled C library via CFFI. The actual parsing and rendering happens
+entirely in C, with Python involved only for the function call overhead and string
+encoding/decoding. This architecture gives you the ergonomics of Python with the speed
+of native code.
+
+For typical Markdown documents (a few kilobytes), rendering completes in microseconds.
+The overhead of the Python-to-C boundary is negligible compared to what a pure-Python
+parser would spend on the same input.
+
+## Measuring Render Time
+
+You can measure rendering performance directly with Python's `timeit` module. Here is a
+realistic benchmark using a document of moderate length.
+
+```{python}
+import timeit
+from multimark import markdown_to_html
+
+# Build a document with varied content
+fence = "```"
+doc = (
+    "# Benchmark Document\n\n"
+    "This is a paragraph with **bold**, *italic*, and `code` formatting.\n\n"
+    "## Lists\n\n"
+    "- First item with a [link](https://example.com)\n"
+    "- Second item with ~~strikethrough~~\n"
+    "- Third item\n\n"
+    "## Code\n\n"
+    f"{fence}python\ndef hello():\n    return \"world\"\n{fence}\n\n"
+    "## Table\n\n"
+    "| Column A | Column B | Column C |\n"
+    "|----------|----------|----------|\n"
+    "| 1        | 2        | 3        |\n"
+    "| 4        | 5        | 6        |\n\n"
+    "> A block quote to round things out.\n\n"
+) * 10  # Repeat 10x for a ~4KB document
+
+# Time 1000 iterations
+elapsed = timeit.timeit(
+    lambda: markdown_to_html(doc, smart=True, extensions=["table", "strikethrough"]),
+    number=1000,
+)
+
+print(f"Document size: {len(doc):,} bytes")
+print(f"1000 renders: {elapsed:.3f}s")
+print(f"Per render: {elapsed / 1000 * 1_000_000:.1f} µs")
+```
+
+## Memory Efficiency
+
+Each render call allocates memory for the AST and output buffer in C, then frees it
+before returning. There is no persistent state between calls, which means memory usage
+stays constant regardless of how many documents you process.
+
+```{python}
+import sys
+from multimark import markdown_to_html
+
+# The result is a plain Python string
+result = markdown_to_html("# Hello\n\nWorld\n")
+print(f"Result type: {type(result).__name__}")
+print(f"Result size: {sys.getsizeof(result)} bytes")
+```
+
+The C library manages its own memory internally. Python only holds the final output
+string, so you do not need to worry about manual memory management or cleanup.
+
+## Tips for Maximum Throughput
+
+When processing large volumes of documents, a few practices help you get the most out of
+multimark.
+
+::: {.details summary="Performance tips" type="tip" icon="zap"}
+
+**Minimize extension overhead.** Each enabled extension adds a small amount of parsing
+work. If you do not need tables or autolinks for a particular batch, omit them.
+
+**Reuse option values.** Building the options bitmask is cheap, but defining it once
+outside a loop avoids redundant work.
+
+**Process in batches, not one-at-a-time.** If you are reading files from disk, batch the
+I/O and render calls together rather than interleaving with other heavy operations.
+
+**Avoid unnecessary encoding.** Multimark accepts `str` and handles UTF-8 encoding
+internally. Do not pre-encode to bytes and decode back; just pass the string directly.
+
+:::
+
+## Comparison Context
+
+Pure-Python Markdown parsers (like `markdown`, `mistune`, or `commonmark.py`) typically
+process documents at a rate of hundreds of microseconds to low milliseconds per document.
+Multimark operates in the single-digit to tens-of-microseconds range for the same
+documents, representing a roughly 10x to 50x improvement depending on document
+complexity and enabled extensions.
+
+This difference matters most when processing large batches (documentation sites, content
+management systems) or when rendering on hot paths (real-time previews, API endpoints).
+For rendering a single README file, any parser is fast enough.
