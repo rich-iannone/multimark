@@ -24,7 +24,46 @@ from multimark._binding import lib
 
 
 class Options(IntFlag):
-    """CommonMark/GFM parsing/rendering options."""
+    """CommonMark/GFM parsing and rendering options.
+
+    An `IntFlag` enumeration of all option flags supported by the cmark-gfm library.
+    Options can be combined using the bitwise OR operator (`|`) and passed to any
+    renderer's `options=` parameter. This provides a composable, lower-level alternative
+    to the named boolean keyword arguments available on each renderer function.
+
+    Most users will prefer the named keyword arguments (e.g., `smart=True`) for common
+    options. The `Options` bitmask is useful when you need to combine multiple flags
+    into a single reusable value, or when working with GFM-specific flags that do not
+    have dedicated keyword arguments.
+
+    Examples
+    --------
+    Combine multiple flags with the `|` operator:
+
+    ```{python}
+    from multimark import markdown_to_html, Options
+
+    opts = Options.SMART | Options.UNSAFE
+    markdown_to_html('"Hello" -- world', options=opts)
+    ```
+
+    Mix a bitmask with named keyword arguments (they are OR'd together):
+
+    ```{python}
+    text = "Here's some *text* to convert"
+    markdown_to_html(text, options=Options.SMART, footnotes=True)
+    ```
+
+    Use GFM-specific flags that have no keyword shortcut:
+
+    ```{python}
+    markdown_to_html(
+        "~~deleted~~",
+        options=Options.STRIKETHROUGH_DOUBLE_TILDE,
+        extensions=["strikethrough"],
+    )
+    ```
+    """
 
     DEFAULT = lib.CMARK_OPT_DEFAULT
     SOURCEPOS = lib.CMARK_OPT_SOURCEPOS
