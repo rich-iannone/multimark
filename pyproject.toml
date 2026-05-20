@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=68", "setuptools_scm>=6.2", "cffi>=1.15"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "multimark"
+dynamic = ["version"]
+description = "Python bindings to cmark — CommonMark parsing and rendering (HTML, LaTeX, man, XML)"
+readme = "README.md"
+license = {text = "MIT AND BSD-2-Clause"}
+requires-python = ">=3.9"
+dependencies = ["cffi>=1.15"]
+authors = [{name = "Rich Iannone"}]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: C",
+    "Topic :: Text Processing :: Markup :: Markdown",
+]
+
+[project.urls]
+Homepage = "https://github.com/posit-dev/multimark"
+Issues = "https://github.com/posit-dev/multimark/issues"
+
+[tool.setuptools]
+packages = ["multimark"]
+package-dir = {"" = "src"}
+
+[tool.setuptools.package-data]
+multimark = ["*.h"]
+
+[tool.setuptools_scm]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
