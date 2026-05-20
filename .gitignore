@@ -218,6 +218,9 @@ __marimo__/
 .streamlit/secrets.toml
 CMARK.md
 
+# Claude Code
+.claude/
+
 # Great Docs build directory (ephemeral, do not commit)
 great-docs/
 
