@@ -1,0 +1,83 @@
+---
+title: "Installation"
+guide-section: "Getting Started"
+tags: [Setup]
+---
+
+This page covers everything you need to get multimark installed and working on your system, from prerequisites through verification.
+
+## Requirements
+
+Multimark requires Python 3.9 or later and a C compiler available at install time. The
+CFFI build step compiles the vendored cmark-gfm C library into a shared object that
+Python loads at runtime.
+
+On most systems, the necessary build tools are already present. If you are working in a
+minimal container or a fresh virtual machine, you may need to install a compiler
+toolchain first.
+
+::: {.details summary="Platform-specific compiler setup" icon="monitor"}
+
+**macOS**: Install the Xcode command-line tools if you have not already.
+
+```bash
+xcode-select --install
+```
+
+**Ubuntu / Debian**:
+
+```bash
+sudo apt-get install build-essential python3-dev
+```
+
+**Windows**: Install the [Build Tools for Visual Studio](https://visualstudio.microsoft.com/visual-cpp-build-tools/).
+Select the "Desktop development with C++" workload during installation.
+
+:::
+
+## Installing from PyPI
+
+The recommended way to install multimark is with pip inside a virtual environment.
+
+```bash
+python -m pip install multimark
+```
+
+This downloads the source distribution, compiles the C extension, and installs the
+package. The entire process typically takes a few seconds on modern hardware.
+
+## Installing from Source
+
+For development or to get the latest unreleased changes, clone the repository and
+install in editable mode.
+
+```bash
+git clone https://github.com/rich-iannone/multimark.git
+cd multimark
+python -m pip install -e ".[dev]"
+```
+
+Editable mode means changes to the Python source files take effect immediately without
+reinstalling. However, if you modify the C source or the CFFI build script, you need to
+rebuild.
+
+## Verifying the Installation
+
+After installing, confirm that the package loads correctly and reports the expected
+library version.
+
+```{python}
+import multimark
+
+multimark.cmark_version()
+```
+
+If this prints a version string like `0.29.0.gfm.13`, the C library was compiled and
+linked successfully.
+
+## Dependencies
+
+Multimark has a single runtime dependency: [cffi](https://cffi.readthedocs.io/). The
+build process also requires `cffi` (for generating the bindings) and a C compiler.
+There are no other third-party dependencies at runtime, keeping the installation
+lightweight and conflict-free.
