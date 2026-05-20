@@ -9,9 +9,7 @@
 <a href="https://github.com/rich-iannone/multimark/actions/workflows/ci.yml"><img src="https://github.com/rich-iannone/multimark/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI"></a>
 </p>
 
-# multimark
-
-Python bindings to [cmark-gfm](https://github.com/github/cmark-gfm), the C reference implementation of [CommonMark](https://commonmark.org/) with GitHub Flavored Markdown extensions.
+The **multimark** package has Python bindings to [cmark-gfm](https://github.com/github/cmark-gfm), the C reference implementation of [CommonMark](https://commonmark.org/) with GitHub Flavored Markdown extensions.
 
 Renders Markdown to **HTML**, **LaTeX**, **groff man**, **XML**, and **normalized CommonMark**: all from a single, lightweight package.
 
@@ -106,19 +104,34 @@ Available extensions: `table`, `strikethrough`, `autolink`, `tagfilter`, `taskli
 
 Every renderer accepts:
 
-- **`text`** — Markdown string
-- **`options`** — Raw bitmask (default `0`)
-- **`extensions`** — List of GFM extension names (default `()`)
-- **`smart`** — Smart punctuation
-- **`hardbreaks`** — Render soft breaks as `<br>`
-- **`unsafe`** — Allow raw HTML
-- **`normalize`** — Consolidate adjacent text nodes
-- **`footnotes`** — Enable footnote syntax
+- **`text`**: Markdown string
+- **`options`**: raw bitmask (default `0`)
+- **`extensions`**: list of GFM extension names (default `()`)
+- **`smart`**: smart punctuation
+- **`hardbreaks`**: render soft breaks as `<br>`
+- **`unsafe`**: allow raw HTML
+- **`normalize`**: consolidate adjacent text nodes
+- **`footnotes`**: enable footnote syntax
 
 Additional parameters:
 
-- **`sourcepos`** — Source position attributes (HTML and XML only)
-- **`width`** — Line wrap column (LaTeX, man, and commonmark only; `0` = no wrap)
+- **`sourcepos`**: Source position attributes (HTML and XML only)
+- **`width`**: Line wrap column (LaTeX, man, and commonmark only; `0` = no wrap)
+
+## Why multimark?
+
+Several Python packages wrap cmark or provide CommonMark parsing. Here's how they compare:
+
+| | **multimark** | **[cmarkgfm](https://github.com/theacodes/cmarkgfm)** | **[commonmark.py](https://github.com/readthedocs/commonmark.py)** |
+|---|---|---|---|
+| Engine | cmark-gfm (C, vendored) | cmark-gfm (C, vendored) | Pure Python |
+| Output formats | HTML, LaTeX, man, XML, CommonMark | HTML only | HTML only |
+| GFM extensions | ✓ | ✓ | ✗ |
+| Safe by default | ✓ | ✗ | ✗ |
+| Convenience kwargs | `smart=True`, `unsafe=True`, etc. | Raw bitmask only | N/A |
+| Maintained | Active (2026) | Active (2025) | Unmaintained (2019) |
+
+multimark uses the same battle-tested C library as `cmarkgfm` but exposes all five of cmark's output formats (not just HTML). The API is designed around keyword arguments rather than opaque bitmasks, and unsafe content is blocked by default so the safe choice requires no extra configuration.
 
 ## License
 
