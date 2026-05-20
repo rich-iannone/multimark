@@ -1,0 +1,67 @@
+Fast Python bindings to [cmark-gfm](https://github.com/github/cmark-gfm), the C reference implementation of CommonMark with GitHub Flavored Markdown extensions. Render Markdown to five output formats from a single, lightweight package.
+
+## Install and Go
+
+```bash
+pip install multimark
+```
+
+Wheels are available for Linux, macOS, and Windows (Python 3.9+). No system dependencies required.
+
+```python
+from multimark import markdown_to_html
+
+markdown_to_html("**Hello**, *world*!")
+# '<p><strong>Hello</strong>, <em>world</em>!</p>\n'
+```
+
+## Five Output Formats
+
+| Function | Output |
+|----------|--------|
+| `markdown_to_html()` | HTML |
+| `markdown_to_latex()` | LaTeX |
+| `markdown_to_man()` | groff man page |
+| `markdown_to_commonmark()` | Normalized CommonMark |
+| `markdown_to_xml()` | XML (AST) |
+
+Every renderer shares the same interface: pass a Markdown string, get formatted output back. No intermediate objects, no setup.
+
+## GitHub Flavored Markdown Built In
+
+Enable tables, strikethrough, autolinks, task lists, and tag filtering with a single argument:
+
+```python
+from multimark import markdown_to_html
+
+markdown_to_html(
+    "| A | B |\n|---|---|\n| 1 | 2 |\n",
+    extensions=["table"],
+)
+```
+
+## Safe by Default
+
+Raw HTML is stripped from output unless you explicitly opt in with `unsafe=True`. Smart punctuation, source position mapping, footnotes, and line wrapping are all one keyword argument away.
+
+```python
+markdown_to_html('"Hello" -- world...', smart=True)
+# '<p>\u201cHello\u201d \u2013 world\u2026</p>\n'
+```
+
+```{=html}
+<div class="gd-cta-grid">
+  <a href="user-guide/introduction.html" class="gd-cta-card">
+    <span class="gd-cta-icon">📖</span>
+    <span class="gd-cta-title">User Guide</span>
+    <span class="gd-cta-desc">Installation, quick start, extensions, output formats, options, and recipes.</span>
+    <span class="gd-cta-arrow">→</span>
+  </a>
+  <a href="reference/index.html" class="gd-cta-card">
+    <span class="gd-cta-icon">⚙️</span>
+    <span class="gd-cta-title">API Reference</span>
+    <span class="gd-cta-desc">Full documentation for every renderer, option flag, and utility function.</span>
+    <span class="gd-cta-arrow">→</span>
+  </a>
+</div>
+```
