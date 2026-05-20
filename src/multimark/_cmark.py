@@ -13,6 +13,21 @@ VALID_EXTENSIONS = frozenset(
     ["table", "strikethrough", "autolink", "tagfilter", "tasklist"]
 )
 
+# Cache resolved extension pointers to avoid repeated C lookups.
+_EXT_CACHE: dict[str, object] = {}
+
+
+def _get_extension(name: str):
+    """Return the cached C pointer for a named extension."""
+    try:
+        return _EXT_CACHE[name]
+    except KeyError:
+        ext = lib.cmark_find_syntax_extension(name.encode("utf-8"))
+        if ext == ffi.NULL:
+            raise ValueError(f"Unknown extension: {name!r}")
+        _EXT_CACHE[name] = ext
+        return ext
+
 
 def _build_options(
     options: int,
@@ -51,11 +66,7 @@ def _parse_with_extensions(
         raise MemoryError("Failed to create parser")
 
     for ext_name in extensions:
-        ext = lib.cmark_find_syntax_extension(ext_name.encode("utf-8"))
-        if ext == ffi.NULL:
-            lib.cmark_parser_free(parser)
-            raise ValueError(f"Unknown extension: {ext_name!r}")
-        lib.cmark_parser_attach_syntax_extension(parser, ext)
+        lib.cmark_parser_attach_syntax_extension(parser, _get_extension(ext_name))
 
     lib.cmark_parser_feed(parser, encoded, len(encoded))
     node = lib.cmark_parser_finish(parser)
@@ -201,7 +212,7 @@ def markdown_to_html(
             result_ptr = lib.cmark_render_html(node, opts, ext_list)
             if result_ptr == ffi.NULL:
                 raise MemoryError("Failed to render document")
-            result = ffi.string(result_ptr).decode("utf-8", errors="replace")
+            result = ffi.string(result_ptr).decode("utf-8")
             lib.free(result_ptr)
             return result
         finally:
@@ -215,7 +226,7 @@ def markdown_to_html(
             result_ptr = lib.cmark_render_html(node, opts, ffi.NULL)
             if result_ptr == ffi.NULL:
                 raise MemoryError("Failed to render document")
-            result = ffi.string(result_ptr).decode("utf-8", errors="replace")
+            result = ffi.string(result_ptr).decode("utf-8")
             lib.free(result_ptr)
             return result
         finally:
@@ -314,7 +325,7 @@ def markdown_to_xml(
             result_ptr = lib.cmark_render_xml(node, opts)
             if result_ptr == ffi.NULL:
                 raise MemoryError("Failed to render document")
-            result = ffi.string(result_ptr).decode("utf-8", errors="replace")
+            result = ffi.string(result_ptr).decode("utf-8")
             lib.free(result_ptr)
             return result
         finally:
@@ -328,7 +339,7 @@ def markdown_to_xml(
             result_ptr = lib.cmark_render_xml(node, opts)
             if result_ptr == ffi.NULL:
                 raise MemoryError("Failed to render document")
-            result = ffi.string(result_ptr).decode("utf-8", errors="replace")
+            result = ffi.string(result_ptr).decode("utf-8")
             lib.free(result_ptr)
             return result
         finally:
