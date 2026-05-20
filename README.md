@@ -2,7 +2,7 @@
 
 Python bindings to [cmark-gfm](https://github.com/github/cmark-gfm), the C reference implementation of [CommonMark](https://commonmark.org/) with GitHub Flavored Markdown extensions.
 
-Renders Markdown to **HTML**, **LaTeX**, **groff man**, **XML**, and **normalized CommonMark** — all from a single, lightweight package.
+Renders Markdown to **HTML**, **LaTeX**, **groff man**, **XML**, and **normalized CommonMark**: all from a single, lightweight package.
 
 ## Installation
 
