@@ -1,0 +1,125 @@
+---
+title: "Security Considerations"
+guide-section: "Advanced Usage"
+tags: [Security, HTML]
+---
+
+This page covers the security model that multimark uses when rendering untrusted Markdown, and how to relax it safely when you need raw HTML passthrough.
+
+## The Default Is Safe
+
+Multimark strips raw HTML from input by default. This means you can safely pass
+untrusted Markdown (user comments, forum posts, uploaded documents) through any renderer
+without risking cross-site scripting (XSS) or HTML injection.
+
+```{python}
+from multimark import markdown_to_html
+
+# Untrusted input with malicious HTML
+untrusted = """
+Check this out:
+
+<script>document.cookie</script>
+
+<img src=x onerror="alert('xss')">
+"""
+
+print(markdown_to_html(untrusted))
+```
+
+Both the `<script>` tag and the malicious `<img>` are replaced with harmless comments.
+The text content of the document is preserved; only the raw HTML is neutralized.
+
+## What Gets Stripped
+
+When `unsafe=False` (the default), the following are all replaced with
+`<!-- raw HTML omitted -->`:
+
+- Block-level HTML (e.g., `<div>`, `<table>`, `<script>`)
+- Inline HTML (e.g., `<span>`, `<img>`, `<a>` tags written directly)
+- Dangerous URL schemes (e.g., `javascript:`, `vbscript:`, `data:` in links)
+
+Standard Markdown link and image syntax is not affected. Only literal HTML tags embedded
+in the Markdown source are stripped.
+
+```{python}
+# Markdown links work fine (they produce safe, well-formed HTML)
+print(markdown_to_html("[Click here](https://example.com)"))
+
+# But raw <a> tags are stripped
+print(markdown_to_html('<a href="javascript:alert(1)">Click</a>'))
+```
+
+## When to Use `unsafe=True`
+
+There are legitimate cases where you need raw HTML passthrough:
+
+- You control the Markdown source entirely (e.g., your own documentation)
+- You are building a static site generator where authors are trusted
+- You need to embed custom HTML components (videos, widgets, forms)
+
+In these situations, `unsafe=True` is appropriate because the input is not adversarial.
+
+```{python}
+# Trusted content: embedding a video player
+trusted = """\
+## Demo Video
+
+<video controls width="640">
+  <source src="demo.mp4" type="video/mp4">
+</video>
+
+The video above shows the installation process.
+"""
+
+print(markdown_to_html(trusted, unsafe=True))
+```
+
+## Tag Filtering as a Middle Ground
+
+The `tagfilter` GFM extension provides a middle ground between full stripping and full
+passthrough. It allows most HTML through but neutralizes a specific set of dangerous
+tags: `<textarea>`, `<style>`, `<xmp>`, `<iframe>`, `<noembed>`, `<noframes>`,
+`<script>`, and `<plaintext>`.
+
+```{python}
+# tagfilter + unsafe: allow safe HTML, block dangerous tags
+mixed = """\
+<div class="note">This is fine</div>
+
+<script>alert('blocked')</script>
+
+<em>Also fine</em>
+"""
+
+print(markdown_to_html(mixed, unsafe=True, extensions=["tagfilter"]))
+```
+
+The dangerous tags have their opening `<` replaced with `&lt;`, rendering them visible
+as text rather than executable HTML. Other tags like `<div>` and `<em>` pass through
+normally. This matches GitHub's approach to rendering user content.
+
+## Defense in Depth
+
+For applications processing user-generated content, multimark's default safe mode is
+your first line of defense. However, good security practice involves multiple layers.
+
+::: {.details summary="Recommended security layers" type="tip" icon="shield"}
+
+1. **Keep `unsafe=False`** (the default). This eliminates the vast majority of XSS
+   vectors at the Markdown-to-HTML conversion step.
+
+2. **Use `tagfilter`** if you need some HTML passthrough. It blocks the most dangerous
+   tags while allowing benign formatting.
+
+3. **Apply a secondary HTML sanitizer** (like [Bleach](https://github.com/mozilla/bleach)
+   or [nh3](https://github.com/messense/nh3)) after rendering if your threat model
+   requires belt-and-suspenders protection.
+
+4. **Set Content-Security-Policy headers** on your web server to prevent inline script
+   execution regardless of what HTML reaches the browser.
+
+:::
+
+These layers work together so that a failure in any one layer does not expose your users
+to an attack.
