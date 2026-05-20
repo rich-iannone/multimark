@@ -1,3 +1,7 @@
+<p align="center">
+<img src="https://rich-iannone.github.io/multimark/assets/logo.png" alt="multimark" width="350">
+</p>
+<p align="center">
 <a href="https://pypi.org/project/multimark/"><img src="https://img.shields.io/pypi/v/multimark?logo=python&logoColor=white&color=orange" alt="PyPI"></a>
 <a href="https://pypi.org/project/multimark/"><img src="https://img.shields.io/pypi/pyversions/multimark.svg" alt="Python versions"></a>
 <a href="https://pypistats.org/packages/multimark"><img src="https://img.shields.io/pypi/dm/multimark" alt="Downloads"></a>
