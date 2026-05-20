@@ -1,0 +1,116 @@
+---
+title: "Quick Start"
+guide-section: "Getting Started"
+tags: [Tutorial, HTML]
+---
+
+This page walks you through the essentials of converting Markdown to HTML with multimark, covering inline formatting, block elements, smart punctuation, and safe HTML handling.
+
+## Your First Conversion
+
+The most common task is converting Markdown to HTML. Import the renderer and pass it a
+string.
+
+```{python}
+from multimark import markdown_to_html
+
+print(markdown_to_html("# Welcome\n\nThis is **bold** and *italic* text.\n"))
+```
+
+::: {.callout-tip}
+## `print()` vs. bare expressions
+
+Throughout this guide, examples use `print()` to display rendered output. This shows
+the string with newlines expanded, making the HTML structure easy to read. Without
+`print()`, Python displays the `repr()` of the string (with escaped `\n` characters
+and surrounding quotes), which is harder to scan visually.
+:::
+
+The output is a complete HTML fragment with proper block-level structure. Headings become
+`<h1>` through `<h6>` elements, paragraphs are wrapped in `<p>` tags, and inline
+formatting maps to `<strong>` and `<em>`.
+
+## Working with Inline Formatting
+
+Markdown supports a rich set of inline constructs. Multimark handles all of them
+correctly, including nested formatting.
+
+```{python}
+text = """
+This has **bold**, *italic*, `inline code`, and ***bold italic***.
+
+Here is a [link](https://example.com) and an ![image](logo.png "alt text").
+"""
+
+print(markdown_to_html(text))
+```
+
+Notice that the raw HTML output includes proper attribute encoding and escaping. Special
+characters like `<`, `>`, and `&` in your Markdown text are escaped automatically in the
+HTML output.
+
+## Block-Level Elements
+
+Beyond paragraphs and headings, Markdown supports block quotes, code blocks, and lists.
+Each renders to its corresponding HTML structure.
+
+```{python}
+fence = "```"
+blocks = (
+    "> A block quote with **emphasis**.\n\n"
+    "- Item one\n"
+    "- Item two\n"
+    "- Item three\n\n"
+    f"{fence}python\n"
+    "def hello():\n"
+    '    print("Hello!")\n'
+    f"{fence}\n"
+)
+
+print(markdown_to_html(blocks))
+```
+
+Fenced code blocks preserve their language annotation in a `class` attribute on the
+`<code>` element, which is useful for client-side syntax highlighting libraries.
+
+## Smart Punctuation
+
+Straight quotes and ASCII dashes look fine in source code but feel out of place in
+typeset prose. The `smart` option converts them to their typographic equivalents.
+
+```{python}
+prose = '"It\'s a beautiful day," she said -- "let\'s go outside..."'
+
+print(markdown_to_html(prose, smart=True))
+```
+
+With `smart=True`, double quotes become curly quotes, single quotes become apostrophes,
+`--` becomes an en-dash, and `...` becomes an ellipsis character. This produces
+publication-quality output from plain ASCII input.
+
+## Handling Raw HTML
+
+By default, multimark strips raw HTML from the input for security. This is the safe
+choice when processing untrusted content (user comments, forum posts, uploaded files).
+
+```{python}
+# Raw HTML is stripped by default
+print(markdown_to_html("<div class='custom'>Hello</div>"))
+```
+
+When you control the input and need HTML passthrough, set `unsafe=True`.
+
+```{python}
+print(markdown_to_html("<div class='custom'>Hello</div>", unsafe=True))
+```
+
+The `unsafe` flag affects both block-level HTML (like `<div>`) and inline HTML (like
+`<span>`). It also allows potentially dangerous URL schemes like `javascript:` in links.
+Only enable this for content you fully trust.
+
+## What Comes Next
+
+This page covered the basics of HTML rendering with multimark. The following pages
+explore GFM extensions, the other output formats, and the options system in depth. Each
+builds on what you have seen here, using the same straightforward API pattern: pass
+text in, get rendered output back.
