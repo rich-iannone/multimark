@@ -127,7 +127,7 @@ Several Python packages wrap cmark or provide CommonMark parsing. Here's how the
 | Engine | cmark-gfm (C, vendored) | cmark-gfm (C, vendored) | Pure Python |
 | Output formats | HTML, LaTeX, man, XML, CommonMark | HTML only | HTML only |
 | GFM extensions | ✓ | ✓ | ✗ |
-| Safe by default | ✓ | ✗ | ✗ |
+| Safe by default | ✓ | ✓ | ✗ |
 | Convenience kwargs | `smart=True`, `unsafe=True`, etc. | Raw bitmask only | N/A |
 | Maintained | Active (2026) | Active (2025) | Unmaintained (2019) |
 
