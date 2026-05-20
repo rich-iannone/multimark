@@ -1,0 +1,168 @@
+---
+title: "GFM Extensions"
+guide-section: "Core Concepts"
+tags: [Extensions, HTML, Tables]
+---
+
+This page explains the five GitHub Flavored Markdown extensions that multimark supports, with examples showing how each one works and how to combine them.
+
+## What Are GFM Extensions?
+
+GitHub Flavored Markdown (GFM) extends the CommonMark specification with five additional
+syntax features. These are the constructs that GitHub recognizes in README files, issues,
+and pull requests but that are not part of the base CommonMark spec.
+
+Multimark supports all five GFM extensions through the `extensions` parameter, which
+accepts a sequence of extension names. Extensions are disabled by default so that the
+parser remains strictly CommonMark-compliant unless you opt in.
+
+```{python}
+from multimark import VALID_EXTENSIONS
+
+sorted(VALID_EXTENSIONS)
+```
+
+Each extension is independent: you enable only the ones you need.
+
+## Tables
+
+The `table` extension adds pipe-table syntax. Columns are separated by `|` characters,
+and a header row is separated from body rows by a line of dashes.
+
+```{python}
+from multimark import markdown_to_html
+
+table_md = """\
+| Feature    | Status |
+|------------|--------|
+| Tables     | ✓      |
+| Autolinks  | ✓      |
+| Tasklists  | ✓      |
+"""
+
+print(markdown_to_html(table_md, extensions=["table"]))
+```
+
+Column alignment is controlled with colons in the separator row: `:---` for left,
+`:---:` for center, and `---:` for right. The renderer emits `style="text-align: ..."`
+attributes on the `<th>` and `<td>` elements.
+
+```{python}
+aligned = """\
+| Left | Center | Right |
+|:-----|:------:|------:|
+| a    | b      | c     |
+"""
+
+print(markdown_to_html(aligned, extensions=["table"]))
+```
+
+## Strikethrough
+
+The `strikethrough` extension recognizes `~~text~~` as deleted content, rendering it
+with `<del>` tags.
+
+```{python}
+print(markdown_to_html("This is ~~no longer~~ relevant.", extensions=["strikethrough"]))
+```
+
+Strikethrough works inline alongside other formatting. You can combine it with bold,
+italic, and code spans without issue.
+
+```{python}
+combined = "~~**bold and struck**~~ and ~~`code struck`~~"
+print(markdown_to_html(combined, extensions=["strikethrough"]))
+```
+
+## Autolinks
+
+The `autolink` extension automatically converts bare URLs and email addresses into
+clickable links without requiring explicit Markdown link syntax.
+
+```{python}
+text = """\
+Visit https://github.com for more info.
+
+Send feedback to user@example.com.
+"""
+
+print(markdown_to_html(text, extensions=["autolink"]))
+```
+
+This is the same behavior you see on GitHub: any URL starting with `http://` or
+`https://` becomes a link, and email addresses get `mailto:` links.
+
+## Tag Filtering
+
+The `tagfilter` extension suppresses a specific set of HTML tags that could be used for
+XSS attacks, even when `unsafe=True` is set. The filtered tags are: `<textarea>`,
+`<style>`, `<xmp>`, `<iframe>`, `<noembed>`, `<noframes>`, `<script>`, and `<plaintext>`.
+
+```{python}
+html_input = "Before <script>alert('xss')</script> after"
+print(markdown_to_html(html_input, unsafe=True, extensions=["tagfilter"]))
+```
+
+The tags are not removed entirely. Instead, the opening `<` is replaced with `&lt;`,
+rendering them inert while preserving the text content for visibility. This matches
+GitHub's behavior for user-generated content.
+
+## Task Lists
+
+The `tasklist` extension renders list items that begin with `[ ]` or `[x]` as checkbox
+items with a special CSS class.
+
+```{python}
+tasks = """\
+- [x] Write documentation
+- [x] Add tests
+- [ ] Publish release
+"""
+
+print(markdown_to_html(tasks, extensions=["tasklist"]))
+```
+
+The checkboxes are rendered as `<input>` elements with `type="checkbox"` and a
+`disabled` attribute (since they are static content, not interactive form elements).
+
+## Combining Extensions
+
+Extensions compose freely. Enable as many as you need by passing multiple names in the
+`extensions` list.
+
+```{python}
+doc = """\
+## Release Notes
+
+| Change        | Status       |
+|---------------|--------------|
+| ~~Old API~~   | Removed      |
+| New API       | Added        |
+
+Tasks remaining:
+
+- [x] Update docs at https://example.com/docs
+- [ ] Tag release
+
+Contact: releases@example.com
+"""
+
+print(markdown_to_html(doc, extensions=["table", "strikethrough", "tasklist", "autolink"]))
+```
+
+The order of extension names in the list does not matter. The parser enables all
+requested extensions before processing the input.
+
+## Extensions with Other Renderers
+
+GFM extensions work with all five output formats, not just HTML. Here is the same table
+rendered as LaTeX.
+
+```{python}
+from multimark import markdown_to_latex
+
+print(markdown_to_latex(table_md, extensions=["table"]))
+```
+
+The LaTeX renderer maps table structure to `tabular` environments. Each renderer
+translates extension syntax into its native equivalent where possible.
