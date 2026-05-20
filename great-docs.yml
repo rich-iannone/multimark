@@ -66,7 +66,8 @@ reference:
   - title: Options
     desc: Parsing and rendering configuration
     contents:
-      - Options
+      - name: Options
+        members: false
 
   - title: Utility
     desc: Package information
@@ -80,6 +81,44 @@ reference:
 # auto-generated API reference pages. Can be overridden in individual .qmd
 # file frontmatter if needed for special cases.
 jupyter: python3
+
+# Navigation Icons
+# ----------------
+nav_icons:
+  navbar:
+    User Guide: book-open
+    Reference: code-2
+  sidebar:
+    Getting Started: rocket
+    Core Concepts: puzzle
+    Advanced Usage: graduation-cap
+    Introduction: info
+    Installation: download
+    Quick Start: play
+    GFM Extensions: blocks
+    Output Formats: file-output
+    Options and Flags: sliders-horizontal
+    Security Considerations: shield
+    Practical Recipes: chef-hat
+    Performance: zap
+
+# Tags
+# ----
+tags:
+  enabled: true
+  icons:
+    Overview: info
+    Setup: download
+    Tutorial: book-open
+    HTML: globe
+    LaTeX: file-text
+    XML: file-code
+    Extensions: blocks
+    Tables: table
+    Configuration: sliders-horizontal
+    Options: toggle-left
+    Security: shield
+    Performance: zap
 
 # CLI Documentation
 # -----------------
