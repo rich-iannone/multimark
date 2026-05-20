@@ -1,0 +1,161 @@
+---
+title: "Options and Flags"
+guide-section: "Core Concepts"
+tags: [Configuration, Options]
+---
+
+This page explains how to control parsing and rendering behavior through keyword arguments, the `Options` bitmask, or a combination of both.
+
+## Two Ways to Configure
+
+Every renderer accepts configuration through two complementary mechanisms: boolean
+keyword arguments and an `Options` bitmask. You can use either one or both together.
+They are merged with a bitwise OR, so there is no conflict between them.
+
+The keyword arguments cover the most commonly used flags:
+
+```{python}
+from multimark import markdown_to_html
+
+# Using keyword arguments
+markdown_to_html("'Hello' -- world...", smart=True)
+```
+
+The `Options` enum covers every flag, including GFM-specific ones that have no keyword
+shortcut:
+
+```{python}
+from multimark import markdown_to_html, Options
+
+# Using the Options bitmask
+markdown_to_html("'Hello' -- world...", options=Options.SMART)
+```
+
+Both calls produce the same result. The keyword style is more readable for one or two
+flags; the bitmask style is more concise when combining many flags into a reusable
+configuration.
+
+## Available Keyword Arguments
+
+Every renderer accepts these boolean keywords (all default to `False`):
+
+| Keyword | Effect |
+|---------|--------|
+| `hardbreaks` | Render soft line breaks as `<br />` (HTML) or equivalent |
+| `smart` | Convert ASCII quotes and dashes to typographic characters |
+| `normalize` | Consolidate adjacent text nodes in the AST |
+| `unsafe` | Allow raw HTML and dangerous URLs to pass through |
+| `footnotes` | Enable footnote syntax (`[^label]`) |
+
+Additionally, `markdown_to_html` and `markdown_to_xml` accept `sourcepos` (include
+source position data in the output), while `markdown_to_latex`, `markdown_to_man`, and
+`markdown_to_commonmark` accept `width` (line wrapping column, where `0` means no
+wrapping).
+
+## The Options Enum
+
+The `Options` class is an `IntFlag` enumeration. Each member corresponds to a cmark-gfm
+option bit. Because it is an `IntFlag`, members can be combined with the `|` operator.
+
+```{python}
+from multimark import Options
+
+# Combine multiple flags
+opts = Options.SMART | Options.UNSAFE | Options.FOOTNOTES
+print(f"Combined value: {opts}")
+print(f"Individual flags: {opts!r}")
+```
+
+### All Available Flags
+
+The full set of flags includes several GFM-specific options that have no keyword
+argument equivalent.
+
+::: {.details summary="Complete Options reference" icon="list"}
+
+| Flag | Keyword Equivalent | Description |
+|------|-------------------|-------------|
+| `DEFAULT` | (none needed) | No flags set (value `0`) |
+| `SOURCEPOS` | `sourcepos=True` | Include source position attributes |
+| `HARDBREAKS` | `hardbreaks=True` | Render soft breaks as hard breaks |
+| `UNSAFE` | `unsafe=True` | Allow raw HTML passthrough |
+| `NOBREAKS` | (none) | Render soft breaks as spaces |
+| `NORMALIZE` | `normalize=True` | Consolidate adjacent text nodes |
+| `VALIDATE_UTF8` | (none) | Replace invalid UTF-8 sequences |
+| `SMART` | `smart=True` | Typographic quote/dash conversion |
+| `GITHUB_PRE_LANG` | (none) | Use `lang` attribute on `<pre>` instead of `class` on `<code>` |
+| `LIBERAL_HTML_TAG` | (none) | Be more permissive with HTML tag parsing |
+| `FOOTNOTES` | `footnotes=True` | Enable footnote syntax |
+| `STRIKETHROUGH_DOUBLE_TILDE` | (none) | Require `~~` for strikethrough (not `~`) |
+| `FULL_INFO_STRING` | (none) | Include full info string in code block attributes |
+
+:::
+
+## Combining Keywords and Bitmask
+
+When you pass both keyword arguments and an `options` bitmask, they are merged together.
+This lets you use keywords for common flags and the bitmask for GFM-specific ones.
+
+```{python}
+from multimark import markdown_to_html, Options
+
+# smart=True sets SMART, options adds GITHUB_PRE_LANG
+fence = "```"
+code_block = f"'Hello' -- world\n\n{fence}python\nprint('hi')\n{fence}\n"
+print(markdown_to_html(
+    code_block,
+    smart=True,
+    options=Options.GITHUB_PRE_LANG,
+))
+```
+
+Notice how the code block uses `<pre lang="python">` instead of the default
+`<code class="language-python">`. The `GITHUB_PRE_LANG` flag changed the attribute
+style, while `smart=True` handled the punctuation.
+
+## Reusable Configurations
+
+For applications that render many documents with the same settings, define your options
+once and reuse them.
+
+```{python}
+from multimark import markdown_to_html, Options
+
+# A configuration for rendering user-generated content safely
+SAFE_GFM = Options.SMART | Options.VALIDATE_UTF8 | Options.STRIKETHROUGH_DOUBLE_TILDE
+
+def render_comment(text: str) -> str:
+    """Render a user comment with safe defaults."""
+    return markdown_to_html(
+        text,
+        extensions=["table", "strikethrough", "autolink", "tasklist"],
+        options=SAFE_GFM,
+    )
+
+render_comment("'Hello' -- check out https://example.com")
+```
+
+This pattern keeps rendering configuration centralized and easy to audit. If you later
+need to adjust the options, you change one definition rather than updating every call
+site.
+
+## The SAFE vs. UNSAFE Distinction
+
+The `SAFE` and `UNSAFE` flags are complementary. `SAFE` is the legacy name for the
+default behavior (strip raw HTML). `UNSAFE` explicitly opts in to allowing raw HTML.
+
+```{python}
+from multimark import markdown_to_html
+
+raw_html = "<marquee>Dangerous!</marquee>"
+
+# Default: raw HTML is stripped
+print("Safe:", markdown_to_html(raw_html))
+
+# With unsafe=True: raw HTML passes through
+print("Unsafe:", markdown_to_html(raw_html, unsafe=True))
+```
+
+When building applications that accept Markdown from untrusted sources, always leave
+`unsafe` at its default value of `False`. The cost of stripping raw HTML is negligible
+compared to the security risk of XSS vulnerabilities.
