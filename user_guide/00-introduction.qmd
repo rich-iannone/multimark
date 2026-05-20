@@ -1,0 +1,71 @@
+---
+title: "Introduction"
+guide-section: "Getting Started"
+tags: [Overview]
+---
+
+This page gives you a high-level understanding of what multimark does, why it exists, and what you can accomplish with it.
+
+## What Is Multimark?
+
+Multimark is a Python package that provides bindings to
+[cmark-gfm](https://github.com/github/cmark-gfm), GitHub's fork of the CommonMark
+reference parser. It gives you fast, spec-compliant Markdown parsing and rendering in
+five output formats: HTML, LaTeX, groff man pages, XML, and normalized CommonMark.
+
+The C library is vendored and compiled at install time via CFFI, so there are no system
+dependencies to manage. You get a single `pip install` and immediate access to the same
+Markdown engine that powers GitHub.
+
+## Why Use Multimark?
+
+Most Python Markdown libraries are written in pure Python, which means they trade
+performance for portability. Multimark takes a different approach: it wraps a
+battle-tested C library that processes millions of documents daily on GitHub. This gives
+you parsing speeds that are orders of magnitude faster than pure-Python alternatives,
+with guaranteed spec compliance.
+
+Beyond speed, multimark supports the full set of GitHub Flavored Markdown (GFM)
+extensions: tables, strikethrough, autolinks, tag filtering, and task lists. These are
+the same extensions that GitHub uses when rendering README files, issues, and pull
+requests.
+
+## Output Formats at a Glance
+
+Multimark renders parsed Markdown into five distinct formats, each suited to different
+use cases.
+
+::: {.details .open summary="Available formats" icon="file-output"}
+
+| Format | Function | Use Case |
+|--------|----------|----------|
+| HTML | `markdown_to_html()` | Web pages, documentation sites, email |
+| LaTeX | `markdown_to_latex()` | Academic papers, PDF generation |
+| Man page | `markdown_to_man()` | Unix manual pages |
+| XML | `markdown_to_xml()` | AST inspection, toolchain integration |
+| CommonMark | `markdown_to_commonmark()` | Normalization, round-trip formatting |
+
+:::
+
+All renderers share the same parser and accept the same set of options, so switching
+between output formats requires changing only the function name.
+
+## A Quick Taste
+
+Here is the simplest possible use of multimark: converting a Markdown string to HTML.
+
+```{python}
+from multimark import markdown_to_html
+
+markdown_to_html("Hello, **world**!")
+```
+
+The function returns the rendered output as a Python string. Every renderer works this
+way: pass in Markdown text, get back the rendered result.
+
+## Next Steps
+
+The pages that follow will walk you through installation, a more thorough quickstart,
+and then progressively deeper topics. If you prefer to jump straight to the API
+reference, each function is fully documented with executable examples in the
+[Reference](../reference/index.qmd) section.
