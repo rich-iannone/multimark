@@ -2,31 +2,25 @@
 title: "Performance"
 guide-section: "Advanced Usage"
 tags: [Performance]
+freeze: auto
 ---
 
-This page explains why multimark is fast, how to measure its performance, and what practices help you get the most throughput when processing documents at scale.
+This page benchmarks multimark against other popular Python Markdown parsers and
+explains why multimark is fast.
 
-## Why Multimark Is Fast
+## Benchmark: Markdown to HTML
 
-Multimark wraps a compiled C library via CFFI. The actual parsing and rendering happens
-entirely in C, with Python involved only for the function call overhead and string
-encoding/decoding. This architecture gives you the ergonomics of Python with the speed
-of native code.
-
-For typical Markdown documents (a few kilobytes), rendering completes in microseconds.
-The overhead of the Python-to-C boundary is negligible compared to what a pure-Python
-parser would spend on the same input.
-
-## Measuring Render Time
-
-You can measure rendering performance directly with Python's `timeit` module. Here is a
-realistic benchmark using a document of moderate length.
+We render a ~4 KB Markdown document (with headings, lists, code blocks, inline
+formatting, and a table) **1,000 times** and measure the average time per call. All
+parsers produce HTML output. The benchmark document is repeated 10 times to reach a
+realistic size, and each library is configured with GFM table and strikethrough support
+where available.
 
 ```{python}
+#| echo: false
 import timeit
-from multimark import markdown_to_html
 
-# Build a document with varied content
+# Build a realistic benchmark document
 fence = "```"
 doc = (
     "# Benchmark Document\n\n"
@@ -43,18 +37,93 @@ doc = (
     "| 1        | 2        | 3        |\n"
     "| 4        | 5        | 6        |\n\n"
     "> A block quote to round things out.\n\n"
-) * 10  # Repeat 10x for a ~4KB document
+) * 10  # ~4 KB document
 
-# Time 1000 iterations
-elapsed = timeit.timeit(
-    lambda: markdown_to_html(doc, smart=True, extensions=["table", "strikethrough"]),
-    number=1000,
-)
+iterations = 1000
 
-print(f"Document size: {len(doc):,} bytes")
-print(f"1000 renders: {elapsed:.3f}s")
-print(f"Per render: {elapsed / 1000 * 1_000_000:.1f} µs")
+# --- multimark ---
+from multimark import markdown_to_html
+t_multimark = timeit.timeit(
+    lambda: markdown_to_html(doc, extensions=["table", "strikethrough"]),
+    number=iterations,
+) / iterations * 1_000_000  # µs
+
+# --- cmarkgfm ---
+import cmarkgfm
+t_cmarkgfm = timeit.timeit(
+    lambda: cmarkgfm.github_flavored_markdown_to_html(doc),
+    number=iterations,
+) / iterations * 1_000_000
+
+# --- mistune ---
+import mistune
+renderer_mistune = mistune.create_markdown()
+t_mistune = timeit.timeit(
+    lambda: renderer_mistune(doc),
+    number=iterations,
+) / iterations * 1_000_000
+
+# --- markdown-it-py ---
+from markdown_it import MarkdownIt
+md_it = MarkdownIt("gfm-like")
+t_markdown_it = timeit.timeit(
+    lambda: md_it.render(doc),
+    number=iterations,
+) / iterations * 1_000_000
+
+# --- commonmark.py ---
+import commonmark
+t_commonmark = timeit.timeit(
+    lambda: commonmark.commonmark(doc),
+    number=iterations,
+) / iterations * 1_000_000
+
 ```
+
+```{python}
+#| echo: false
+from great_tables import GT, style, loc
+import polars as pl
+
+results = pl.DataFrame({
+    "Package": ["multimark", "cmarkgfm", "mistune", "markdown-it-py", "commonmark.py"],
+    "Engine": ["cmark-gfm (C)", "cmark-gfm (C)", "Pure Python", "Pure Python", "Pure Python"],
+    "Time (µs)": [t_multimark, t_cmarkgfm, t_mistune, t_markdown_it, t_commonmark],
+}).with_columns(
+    pl.col("Time (µs)").round(1),
+    (pl.col("Time (µs)") / t_multimark).round(1).alias("Relative"),
+).sort("Time (µs)")
+
+(
+    GT(results)
+    .tab_header(
+        title="Markdown → HTML Benchmark",
+        subtitle=f"{len(doc):,}-byte document, {iterations:,} iterations, best-of-average",
+    )
+    .fmt_number("Time (µs)", decimals=1)
+    .fmt_number("Relative", decimals=1, pattern="{x}×")
+    .tab_source_note("Lower is better. 'Relative' is normalized to multimark = 1.0×.")
+    .tab_style(
+        style=style.text(weight="bold"),
+        locations=loc.body(rows=[0]),
+    )
+    .tab_options(
+        table_width="100%",
+        quarto_disable_processing=True
+    )
+)
+```
+
+## Why multimark Is Fast
+
+multimark wraps a compiled C library via CFFI. The actual parsing and rendering happens
+entirely in C, with Python involved only for the function call overhead and string
+encoding/decoding. This architecture gives you the ergonomics of Python with the speed
+of native code.
+
+For typical Markdown documents (a few kilobytes), rendering completes in microseconds.
+The overhead of the Python-to-C boundary is negligible compared to what a pure-Python
+parser would spend on the same input.
 
 ## Memory Efficiency
 
@@ -66,7 +135,6 @@ stays constant regardless of how many documents you process.
 import sys
 from multimark import markdown_to_html
 
-# The result is a plain Python string
 result = markdown_to_html("# Hello\n\nWorld\n")
 print(f"Result type: {type(result).__name__}")
 print(f"Result size: {sys.getsizeof(result)} bytes")
@@ -76,9 +144,6 @@ The C library manages its own memory internally. Python only holds the final out
 string, so you do not need to worry about manual memory management or cleanup.
 
 ## Tips for Maximum Throughput
-
-When processing large volumes of documents, a few practices help you get the most out of
-multimark.
 
 ::: {.details summary="Performance tips" type="tip" icon="zap"}
 
@@ -91,19 +156,7 @@ outside a loop avoids redundant work.
 **Process in batches, not one-at-a-time.** If you are reading files from disk, batch the
 I/O and render calls together rather than interleaving with other heavy operations.
 
-**Avoid unnecessary encoding.** Multimark accepts `str` and handles UTF-8 encoding
+**Avoid unnecessary encoding.** multimark accepts `str` and handles UTF-8 encoding
 internally. Do not pre-encode to bytes and decode back; just pass the string directly.
 
 :::
-
-## Comparison Context
-
-Pure-Python Markdown parsers (like `markdown`, `mistune`, or `commonmark.py`) typically
-process documents at a rate of hundreds of microseconds to low milliseconds per document.
-Multimark operates in the single-digit to tens-of-microseconds range for the same
-documents, representing a roughly 10x to 50x improvement depending on document
-complexity and enabled extensions.
-
-This difference matters most when processing large batches (documentation sites, content
-management systems) or when rendering on hot paths (real-time previews, API endpoints).
-For rendering a single README file, any parser is fast enough.
