@@ -42,3 +42,15 @@ multimark = ["*.h"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.coverage.run]
+source = ["multimark"]
+omit = ["src/multimark/_build_cmark.py"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "raise MemoryError",
+    "if .+ == ffi.NULL",
+    "PackageNotFoundError",
+]
