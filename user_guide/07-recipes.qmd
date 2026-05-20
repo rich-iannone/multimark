@@ -1,0 +1,226 @@
+---
+title: "Practical Recipes"
+guide-section: "Advanced Usage"
+tags: [Tutorial, Extensions, HTML, LaTeX]
+---
+
+This page collects practical patterns for common tasks: reading files, building converters, generating LaTeX and man pages, batch processing, and integrating with template engines.
+
+## Rendering Files from Disk
+
+Real-world usage often involves reading Markdown from files rather than inline strings.
+The pattern is straightforward: read the file, render it, use the output.
+
+```{python}
+#| eval: false
+from pathlib import Path
+from multimark import markdown_to_html
+
+content = Path("README.md").read_text(encoding="utf-8")
+html = markdown_to_html(content, extensions=["table", "autolink"])
+```
+
+Always specify `encoding="utf-8"` when reading files. Markdown files should be UTF-8
+encoded, and multimark expects `str` input (not bytes).
+
+## Building a Simple Markdown-to-HTML Converter
+
+A complete file converter needs just a few lines. This example reads a Markdown file,
+wraps the rendered HTML in a minimal document structure, and writes the result.
+
+```{python}
+#| eval: false
+from pathlib import Path
+from multimark import markdown_to_html
+
+def convert_file(src: Path, dst: Path) -> None:
+    """Convert a Markdown file to a standalone HTML file."""
+    md = src.read_text(encoding="utf-8")
+    body = markdown_to_html(md, smart=True, extensions=["table", "autolink"])
+
+    html = f"""\
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><title>{src.stem}</title></head>
+<body>
+{body}
+</body>
+</html>"""
+
+    dst.write_text(html, encoding="utf-8")
+```
+
+This gives you a functional static site generator in under 20 lines.
+
+## Generating LaTeX for Academic Papers
+
+When writing academic papers, you might author content in Markdown and convert it to
+LaTeX for inclusion in a larger document. The `width` parameter keeps the LaTeX source
+readable.
+
+```{python}
+from multimark import markdown_to_latex
+
+abstract = """\
+## Abstract
+
+We present a novel approach to Markdown processing that combines the speed of
+compiled C with the convenience of Python. Our benchmarks show a 50x improvement
+over pure-Python parsers while maintaining full CommonMark compliance.
+
+## Keywords
+
+- Markdown
+- CommonMark
+- Natural language processing
+"""
+
+print(markdown_to_latex(abstract, smart=True, width=72))
+```
+
+The output can be pasted directly into a LaTeX document between
+`\begin{document}` and `\end{document}`. The sectioning commands (`\section`,
+`\subsection`) integrate naturally with LaTeX's document structure.
+
+## Creating Man Pages for CLI Tools
+
+If you maintain command-line tools, you can author the documentation in Markdown and
+generate the groff source for man pages.
+
+```{python}
+from multimark import markdown_to_man
+
+manpage = """\
+## Name
+
+**mytools** - a collection of useful utilities
+
+## Synopsis
+
+**mytools** *command* [*options*]
+
+## Description
+
+Mytools provides several commands for everyday development tasks.
+Use **mytools help** to see a list of available commands.
+
+## Options
+
+- **--verbose**, **-v**: Enable verbose output
+- **--quiet**, **-q**: Suppress all output except errors
+"""
+
+print(markdown_to_man(manpage, width=72))
+```
+
+Wrap this output in a `.TH` header and save it as `mytools.1` to produce a complete man
+page that you can install with your package.
+
+## Footnotes
+
+The `footnotes` option enables footnote syntax, which is useful for academic writing,
+technical documentation, and blog posts.
+
+```{python}
+from multimark import markdown_to_html
+
+doc = """\
+Markdown was created by John Gruber[^1] with contributions from
+Aaron Swartz[^2].
+
+[^1]: John Gruber is the author of Daring Fireball.
+[^2]: Aaron Swartz was a programmer and internet activist.
+"""
+
+print(markdown_to_html(doc, footnotes=True))
+```
+
+Footnote references become superscript links, and the footnote content is collected at
+the bottom of the document with back-links to the reference site.
+
+## Batch Processing
+
+When converting many files, the overhead of Python function calls dominates rather than
+parsing time. The parser initializes quickly, so processing files in a loop is efficient.
+
+```{python}
+#| eval: false
+from pathlib import Path
+from multimark import markdown_to_html
+
+source_dir = Path("docs/")
+output_dir = Path("site/")
+output_dir.mkdir(exist_ok=True)
+
+extensions = ["table", "strikethrough", "autolink", "tasklist"]
+
+for md_file in sorted(source_dir.glob("**/*.md")):
+    html = markdown_to_html(
+        md_file.read_text(encoding="utf-8"),
+        smart=True,
+        extensions=extensions,
+    )
+    out_path = output_dir / md_file.relative_to(source_dir).with_suffix(".html")
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(html, encoding="utf-8")
+```
+
+This pattern scales to thousands of files without issue. The C parser handles each
+document in microseconds, so the bottleneck is typically disk I/O rather than rendering.
+
+## Normalizing Markdown in a Pre-commit Hook
+
+The CommonMark renderer can enforce consistent formatting across a repository. Use it
+in a pre-commit hook to normalize Markdown files before they are committed.
+
+```{python}
+#| eval: false
+from pathlib import Path
+from multimark import markdown_to_commonmark
+
+def normalize_markdown(path: Path) -> bool:
+    """Normalize a Markdown file in place. Returns True if changed."""
+    original = path.read_text(encoding="utf-8")
+    normalized = markdown_to_commonmark(original, width=80)
+
+    if original != normalized:
+        path.write_text(normalized, encoding="utf-8")
+        return True
+    return False
+```
+
+Setting `width=80` produces line-wrapped output that works well with `git diff`. Changes
+to content show up clearly in diffs rather than being obscured by reflowed paragraphs.
+
+## Combining with Jinja2 Templates
+
+For documentation systems or email generators, combine multimark with a template engine
+to produce complete HTML pages with consistent styling.
+
+```{python}
+#| eval: false
+from jinja2 import Template
+from multimark import markdown_to_html
+
+template = Template("""\
+<!DOCTYPE html>
+<html>
+<head><title>{{ title }}</title></head>
+<body>
+<nav>{{ nav }}</nav>
+<main>{{ content }}</main>
+</body>
+</html>
+""")
+
+content_md = "# Hello\n\nWelcome to the site.\n"
+
+page = template.render(
+    title="Home",
+    nav="<a href='/'>Home</a>",
+    content=markdown_to_html(content_md, smart=True),
+)
+```
+
+This separation of concerns keeps your Markdown content clean while the template handles
+layout, navigation, and styling.
