@@ -6,6 +6,10 @@
 # The docstring format used in your package (numpy, google, or sphinx)
 parser: numpy
 
+# Site
+# ----
+site_url: "https://rich-iannone.github.io/multimark/"
+
 # Dynamic Introspection
 # ---------------------
 # Use runtime introspection for more accurate documentation (default: true)
@@ -15,14 +19,15 @@ dynamic: true
 # Logo & Favicon
 # ---------------
 # Point to a single logo file (replaces the text title in the navbar):
-# logo: assets/logo.svg
-#
-# For light/dark variants:
-# logo:
-#   light: assets/logo-light.svg
-#   dark: assets/logo-dark.svg
-#
-# To show the text title alongside the logo, add: show_title: true
+logo:
+  light: assets/logo-light.png
+  dark: assets/logo-dark.png
+
+hero:
+  name: false
+  tagline: "Python bindings to cmark: CommonMark parsing and rendering (HTML, LaTeX, man, XML)"
+  logo_height: 120px
+  badges: false
 
 # Author Information
 # ------------------
