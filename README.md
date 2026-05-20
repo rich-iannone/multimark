@@ -138,4 +138,4 @@ Thanks to extension pointer caching and reduced Python-side overhead, multimark 
 
 ## License
 
-MIT (Python wrapper) and BSD-2-Clause (vendored cmark-gfm).
+MIT and BSD-2-Clause (`cmark-gfm`).
