@@ -1,3 +1,11 @@
+<p align="center">
+<a href="https://pypi.org/project/multimark/"><img src="https://img.shields.io/pypi/v/multimark?logo=python&logoColor=white&color=orange" alt="PyPI"></a>
+<a href="https://pypi.org/project/multimark/"><img src="https://img.shields.io/pypi/pyversions/multimark.svg" alt="Python versions"></a>
+<a href="https://pypistats.org/packages/multimark"><img src="https://img.shields.io/pypi/dm/multimark" alt="Downloads"></a>
+<a href="https://choosealicense.com/licenses/mit/"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="MIT License"></a>
+<a href="https://github.com/rich-iannone/multimark/actions/workflows/ci.yml"><img src="https://github.com/rich-iannone/multimark/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI"></a>
+</p>
+
 # multimark
 
 Python bindings to [cmark-gfm](https://github.com/github/cmark-gfm), the C reference implementation of [CommonMark](https://commonmark.org/) with GitHub Flavored Markdown extensions.
