@@ -35,8 +35,10 @@ hero:
 # You can add additional fields: github, orcid, affiliation, homepage
 authors:
   - name: Rich Iannone
-    role: Author
+    role: Maintainer
+    email: riannone@me.com
     github: rich-iannone
+    orcid: 0000-0003-3925-190X
 
 # Funding / Copyright Holder
 # --------------------------
