@@ -129,9 +129,12 @@ Several Python packages wrap cmark or provide CommonMark parsing. Here's how the
 | GFM extensions | ✓ | ✓ | ✗ |
 | Safe by default | ✓ | ✓ | ✗ |
 | Convenience kwargs | `smart=True`, `unsafe=True`, etc. | Raw bitmask only | N/A |
+| Performance | **Fastest** (14% faster than cmarkgfm) | Fast | ~31× slower |
 | Maintained | Active (2026) | Active (2025) | Unmaintained (2019) |
 
 multimark uses the same battle-tested C library as `cmarkgfm` but exposes all five of cmark's output formats (not just HTML). The API is designed around keyword arguments rather than opaque bitmasks, and unsafe content is blocked by default so the safe choice requires no extra configuration.
+
+Thanks to extension pointer caching and reduced Python-side overhead, multimark is the **fastest Python Markdown-to-HTML library**. Take a look at the [benchmarks](https://rich-iannone.github.io/multimark/user-guide/performance.html) for more detail on this.
 
 ## License
 
