@@ -133,22 +133,22 @@ def markdown_to_html(
         boolean parameters that are set to `True`, so you can mix both styles freely.
         Defaults to `0` (no additional flags beyond those set by keyword arguments).
 
+    Keyword Arguments vs. Options Flags
+    ------------------------------------
+    The boolean keyword arguments (`smart`, `unsafe`, `hardbreaks`, etc.) are convenience
+    shortcuts for the most common `Options` flags. Using `smart=True` is equivalent to
+    passing `options=Options.SMART`. When both are provided, they are merged:
+    `markdown_to_html(text, smart=True, options=Options.UNSAFE)` is the same as
+    `options=Options.SMART | Options.UNSAFE`.
+
+    Some flags (like `Options.GITHUB_PRE_LANG`, `Options.STRIKETHROUGH_DOUBLE_TILDE`,
+    and `Options.LIBERAL_HTML_TAG`) have no keyword shortcut and can only be set via
+    the `options` parameter.
+
     Returns
     -------
     str
         The rendered HTML string. Block-level elements end with a trailing newline.
-
-    Keyword Arguments vs. Options Flags
-    -----------------------------------
-    The boolean keyword arguments (`smart`, `unsafe`, `hardbreaks`, etc.) are
-    convenience shortcuts for the most common `Options` flags. Using `smart=True` is
-    equivalent to passing `options=Options.SMART`. When both are provided, they are
-    merged: `markdown_to_html(text, smart=True, options=Options.UNSAFE)` is the same as
-    `options=Options.SMART | Options.UNSAFE`.
-
-    Some flags (like `Options.GITHUB_PRE_LANG`, `Options.STRIKETHROUGH_DOUBLE_TILDE`,
-    and `Options.LIBERAL_HTML_TAG`) have no keyword shortcut and can only be set via the
-    `options` parameter.
 
     Examples
     --------
@@ -275,25 +275,19 @@ def markdown_to_xml(
 
     options : int
         An integer bitmask of `Options` flags (e.g., `Options.SMART | Options.UNSAFE`).
-        Merged via OR with any boolean keyword arguments set to `True`. See
-        `markdown_to_html` for a detailed explanation of how the two styles interact.
+        Merged via OR with any boolean keyword arguments set to `True`.
         Defaults to `0`.
+
+    Keyword Arguments vs. Options Flags
+    ------------------------------------
+    The boolean keyword arguments (`smart`, `unsafe`, `hardbreaks`, etc.) are convenience
+    shortcuts for the most common `Options` flags. When both styles are provided, they
+    are merged via OR. See `markdown_to_html()` for a detailed explanation.
 
     Returns
     -------
     str
         The rendered XML string, including the XML declaration and DOCTYPE.
-
-    Keyword Arguments vs. Options Flags
-    -----------------------------------
-    The boolean keyword arguments (`smart`, `unsafe`, `hardbreaks`, etc.) are
-    convenience shortcuts for the most common `Options` flags. Using `smart=True` is
-    equivalent to passing `options=Options.SMART`. When both are provided, they are
-    merged with OR so all specified flags take effect.
-
-    Some flags (like `Options.GITHUB_PRE_LANG`, `Options.STRIKETHROUGH_DOUBLE_TILDE`,
-    and `Options.LIBERAL_HTML_TAG`) have no keyword shortcut and can only be set via the
-    `options` parameter.
 
     Examples
     --------
@@ -397,25 +391,19 @@ def markdown_to_latex(
 
     options : int
         An integer bitmask of `Options` flags (e.g., `Options.SMART | Options.UNSAFE`).
-        Merged via OR with any boolean keyword arguments set to `True`. See
-        `markdown_to_html` for a detailed explanation of how the two styles interact.
+        Merged via OR with any boolean keyword arguments set to `True`.
         Defaults to `0`.
+
+    Keyword Arguments vs. Options Flags
+    ------------------------------------
+    The boolean keyword arguments (`smart`, `unsafe`, `hardbreaks`, etc.) are convenience
+    shortcuts for the most common `Options` flags. When both styles are provided, they
+    are merged via OR. See `markdown_to_html()` for a detailed explanation.
 
     Returns
     -------
     str
         The rendered LaTeX string.
-
-    Keyword Arguments vs. Options Flags
-    -----------------------------------
-    The boolean keyword arguments (`smart`, `unsafe`, `hardbreaks`, etc.) are
-    convenience shortcuts for the most common `Options` flags. Using `smart=True` is
-    equivalent to passing `options=Options.SMART`. When both are provided, they are
-    merged with OR so all specified flags take effect.
-
-    Some flags (like `Options.GITHUB_PRE_LANG`, `Options.STRIKETHROUGH_DOUBLE_TILDE`,
-    and `Options.LIBERAL_HTML_TAG`) have no keyword shortcut and can only be set via the
-    `options` parameter.
 
     Examples
     --------
@@ -530,25 +518,19 @@ def markdown_to_man(
 
     options : int
         An integer bitmask of `Options` flags (e.g., `Options.SMART | Options.UNSAFE`).
-        Merged via OR with any boolean keyword arguments set to `True`. See
-        `markdown_to_html` for a detailed explanation of how the two styles interact.
+        Merged via OR with any boolean keyword arguments set to `True`.
         Defaults to `0`.
+
+    Keyword Arguments vs. Options Flags
+    ------------------------------------
+    The boolean keyword arguments (`smart`, `unsafe`, `hardbreaks`, etc.) are convenience
+    shortcuts for the most common `Options` flags. When both styles are provided, they
+    are merged via OR. See `markdown_to_html()` for a detailed explanation.
 
     Returns
     -------
     str
         The rendered groff man page string.
-
-    Keyword Arguments vs. Options Flags
-    -----------------------------------
-    The boolean keyword arguments (`smart`, `unsafe`, `hardbreaks`, etc.) are
-    convenience shortcuts for the most common `Options` flags. Using `smart=True` is
-    equivalent to passing `options=Options.SMART`. When both are provided, they are
-    merged with OR so all specified flags take effect.
-
-    Some flags (like `Options.GITHUB_PRE_LANG`, `Options.STRIKETHROUGH_DOUBLE_TILDE`,
-    and `Options.LIBERAL_HTML_TAG`) have no keyword shortcut and can only be set via the
-    `options` parameter.
 
     Examples
     --------
@@ -660,25 +642,19 @@ def markdown_to_commonmark(
 
     options : int
         An integer bitmask of `Options` flags (e.g., `Options.SMART | Options.UNSAFE`).
-        Merged via OR with any boolean keyword arguments set to `True`. See
-        `markdown_to_html` for a detailed explanation of how the two styles interact.
+        Merged via OR with any boolean keyword arguments set to `True`.
         Defaults to `0`.
+
+    Keyword Arguments vs. Options Flags
+    ------------------------------------
+    The boolean keyword arguments (`smart`, `unsafe`, `hardbreaks`, etc.) are convenience
+    shortcuts for the most common `Options` flags. When both styles are provided, they
+    are merged via OR. See `markdown_to_html()` for a detailed explanation.
 
     Returns
     -------
     str
         The normalized CommonMark string.
-
-    Keyword Arguments vs. Options Flags
-    -----------------------------------
-    The boolean keyword arguments (`smart`, `unsafe`, `hardbreaks`, etc.) are
-    convenience shortcuts for the most common `Options` flags. Using `smart=True` is
-    equivalent to passing `options=Options.SMART`. When both are provided, they are
-    merged with OR so all specified flags take effect.
-
-    Some flags (like `Options.GITHUB_PRE_LANG`, `Options.STRIKETHROUGH_DOUBLE_TILDE`,
-    and `Options.LIBERAL_HTML_TAG`) have no keyword shortcut and can only be set via the
-    `options` parameter.
 
     Examples
     --------
