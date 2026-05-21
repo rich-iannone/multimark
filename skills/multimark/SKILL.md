@@ -103,6 +103,6 @@ The only valid extension names are: `"table"`, `"strikethrough"`, `"autolink"`, 
 
 ## Resources
 
-- [Full documentation](https://rich-iannone.github.io/multimark/)
-- [llms.txt](https://rich-iannone.github.io/multimark/llms.txt): Indexed API reference for LLMs
-- [llms-full.txt](https://rich-iannone.github.io/multimark/llms-full.txt): Comprehensive documentation for LLMs
+- [Full documentation](https://posit-dev.github.io/multimark/)
+- [llms.txt](https://posit-dev.github.io/multimark/llms.txt): Indexed API reference for LLMs
+- [llms-full.txt](https://posit-dev.github.io/multimark/llms-full.txt): Comprehensive documentation for LLMs

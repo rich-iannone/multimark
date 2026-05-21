@@ -52,7 +52,7 @@ For development or to get the latest unreleased changes, clone the repository an
 install in editable mode.
 
 ```bash
-git clone https://github.com/rich-iannone/multimark.git
+git clone https://github.com/posit-dev/multimark.git
 cd multimark
 python -m pip install -e ".[dev]"
 ```

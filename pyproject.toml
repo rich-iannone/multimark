@@ -28,8 +28,8 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/rich-iannone/multimark"
-Issues = "https://github.com/rich-iannone/multimark/issues"
+Homepage = "https://github.com/posit-dev/multimark"
+Issues = "https://github.com/posit-dev/multimark/issues"
 
 [tool.setuptools]
 packages = ["multimark"]

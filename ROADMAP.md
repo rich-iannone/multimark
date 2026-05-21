@@ -48,6 +48,6 @@ Let users walk the parsed tree from Python (not just render to a string).
 
 ## Feedback & Contributions
 
-Have ideas for features not listed here? [Open an issue](https://github.com/rich-iannone/multimark/issues) with the `enhancement` label. Contributions to any planned item are welcome — check existing issues first to avoid duplication.
+Have ideas for features not listed here? [Open an issue](https://github.com/posit-dev/multimark/issues) with the `enhancement` label. Contributions to any planned item are welcome so check existing issues first to avoid duplication.
 
 _This roadmap is a living document. It is updated as features ship and new priorities emerge._

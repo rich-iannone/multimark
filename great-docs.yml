@@ -8,7 +8,7 @@ parser: numpy
 
 # Site
 # ----
-site_url: "https://rich-iannone.github.io/multimark/"
+site_url: "https://posit-dev.github.io/multimark/"
 
 # Dynamic Introspection
 # ---------------------

@@ -1,12 +1,12 @@
 <p align="center">
-<img src="https://rich-iannone.github.io/multimark/assets/logo.png" alt="multimark" width="350">
+<img src="https://posit-dev.github.io/multimark/assets/logo.png" alt="multimark" width="350">
 </p>
 <p align="center">
 <a href="https://pypi.org/project/multimark/"><img src="https://img.shields.io/pypi/v/multimark?logo=python&logoColor=white&color=orange" alt="PyPI"></a>
 <a href="https://pypi.org/project/multimark/"><img src="https://img.shields.io/pypi/pyversions/multimark.svg" alt="Python versions"></a>
 <a href="https://pypistats.org/packages/multimark"><img src="https://img.shields.io/pypi/dm/multimark" alt="Downloads"></a>
 <a href="https://choosealicense.com/licenses/mit/"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="MIT License"></a>
-<a href="https://github.com/rich-iannone/multimark/actions/workflows/ci.yml"><img src="https://github.com/rich-iannone/multimark/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI"></a>
+<a href="https://github.com/posit-dev/multimark/actions/workflows/ci.yml"><img src="https://github.com/posit-dev/multimark/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI"></a>
 </p>
 
 The **multimark** package has Python bindings to [cmark-gfm](https://github.com/github/cmark-gfm), the C reference implementation of [CommonMark](https://commonmark.org/) with GitHub Flavored Markdown extensions.
@@ -134,7 +134,7 @@ Several Python packages wrap cmark or provide CommonMark parsing. Here's how the
 
 multimark uses the same battle-tested C library as `cmarkgfm` but exposes all five of cmark's output formats (not just HTML). The API is designed around keyword arguments rather than opaque bitmasks, and unsafe content is blocked by default so the safe choice requires no extra configuration.
 
-Thanks to extension pointer caching and reduced Python-side overhead, multimark is the **fastest Python Markdown-to-HTML library**. Take a look at the [benchmarks](https://rich-iannone.github.io/multimark/user-guide/performance.html) for more detail on this.
+Thanks to extension pointer caching and reduced Python-side overhead, multimark is the **fastest Python Markdown-to-HTML library**. Take a look at the [benchmarks](https://posit-dev.github.io/multimark/user-guide/performance.html) for more detail on this.
 
 ## License
 

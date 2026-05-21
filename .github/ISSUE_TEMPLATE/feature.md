@@ -7,8 +7,8 @@ labels: "Type: ★ Enhancement"
 
 ## Prework
 
-- [ ] Read and abide by the multimark [code of conduct](https://www.contributor-covenant.org/version/3/0/) and [contributing guidelines](https://github.com/rich-iannone/multimark/blob/main/.github/CONTRIBUTING.md).
-- [ ] Search for duplicates among the [existing issues](https://github.com/rich-iannone/multimark/issues) (both open and closed).
+- [ ] Read and abide by the multimark [code of conduct](https://www.contributor-covenant.org/version/3/0/) and [contributing guidelines](https://github.com/posit-dev/multimark/blob/main/.github/CONTRIBUTING.md).
+- [ ] Search for duplicates among the [existing issues](https://github.com/posit-dev/multimark/issues) (both open and closed).
 
 ## Proposal
 

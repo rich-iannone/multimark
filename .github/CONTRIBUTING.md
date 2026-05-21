@@ -8,7 +8,7 @@ Thank you for your interest in contributing to multimark! We welcome contributio
 
 If you find a bug or have a suggestion for improvement:
 
-1. Check if the issue already exists in the [issue tracker](https://github.com/rich-iannone/multimark/issues)
+1. Check if the issue already exists in the [issue tracker](https://github.com/posit-dev/multimark/issues)
 2. If not, create a new issue with a clear description
 3. Include steps to reproduce (for bugs) or use cases (for features)
 
